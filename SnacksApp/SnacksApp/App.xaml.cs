@@ -1,12 +1,18 @@
 ﻿namespace SnacksApp
 {
+    using SnacksApp.Pages;
+    using SnacksApp.Services;
+
     public partial class App : Application
     {
-        public App()
+        private readonly ApiService _apiService;
+
+        public App(ApiService apiService)
         {
             InitializeComponent();
 
-            MainPage = new AppShell();
+            _apiService = apiService;
+            MainPage = new NavigationPage(new RegisterPage(_apiService));
         }
     }
 }
