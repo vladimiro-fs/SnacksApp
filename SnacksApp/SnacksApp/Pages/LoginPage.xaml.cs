@@ -1,15 +1,18 @@
-using SnacksApp.Services;
-
 namespace SnacksApp.Pages;
+
+using SnacksApp.Services;
+using SnacksApp.Validations;
 
 public partial class LoginPage : ContentPage
 {
 	private readonly ApiService _apiService;
+    private readonly IValidator _validator;
 
-	public LoginPage(ApiService apiService)
+	public LoginPage(ApiService apiService, IValidator validator)
 	{
 		InitializeComponent();
 		_apiService = apiService;
+        _validator = validator;
 	}
 
     private async void BtnSignIn_Clicked(object sender, EventArgs e)
@@ -39,6 +42,6 @@ public partial class LoginPage : ContentPage
 
     private async void TapRegister_Tapped(object sender, TappedEventArgs e)
     {
-        await Navigation.PushAsync(new RegisterPage(_apiService));
+        await Navigation.PushAsync(new RegisterPage(_apiService, _validator));
     }
 }

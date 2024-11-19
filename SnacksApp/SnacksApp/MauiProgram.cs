@@ -1,8 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using SnacksApp.Services;
-
-namespace SnacksApp
+﻿namespace SnacksApp
 {
+    using Microsoft.Extensions.Logging;
+    using SnacksApp.Services;
+    using SnacksApp.Validations;
+
     public static class MauiProgram
     {
         public static MauiApp CreateMauiApp()
@@ -21,7 +22,9 @@ namespace SnacksApp
 #endif
 
             builder.Services.AddHttpClient();
+
             builder.Services.AddSingleton<ApiService>();
+            builder.Services.AddSingleton<IValidator, Validator>();
 
             return builder.Build();
         }
