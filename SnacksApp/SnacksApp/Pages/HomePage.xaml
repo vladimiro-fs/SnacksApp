@@ -23,7 +23,8 @@
 
         <CollectionView Grid.Row="2"
                         x:Name="cvCategorias"
-                        SelectionMode="Single">
+                        SelectionMode="Single"
+                        SelectionChanged="cvCategorias_SelectionChanged">
 
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout ItemSpacing="20"
@@ -52,7 +53,8 @@
 
         <CollectionView x:Name="cvBestSellers"
                         Grid.Row="4"
-                        SelectionMode="Single">
+                        SelectionMode="Single"
+                        SelectionChanged="cvBestSellers_SelectionChanged">
 
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal"
@@ -92,7 +94,8 @@
 
         <CollectionView Grid.Row="6"
                         x:Name="cvMostPopular"
-                        SelectionMode="Single">
+                        SelectionMode="Single"
+                        SelectionChanged="cvMostPopular_SelectionChanged">
 
             <CollectionView.ItemsLayout>
                 <LinearItemsLayout Orientation="Horizontal"

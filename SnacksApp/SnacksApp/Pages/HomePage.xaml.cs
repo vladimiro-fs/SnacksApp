@@ -16,6 +16,7 @@ public partial class HomePage : ContentPage
 		lblUserName.Text = "Hello, " + Preferences.Get("username", string.Empty);
 		_apiService = apiService;
 		_validator = validator;
+		Title = AppConfig.HomePageTitle;
 	}
 
 	protected override async void OnAppearing() 
@@ -119,5 +120,51 @@ public partial class HomePage : ContentPage
 		_loginPageDisplayed = true;
 
 		await Navigation.PushAsync(new LoginPage(_apiService, _validator));	
-	} 
+	}
+
+    private void cvCategorias_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+		var currentSelection = e.CurrentSelection.FirstOrDefault() as Category;
+
+		if (currentSelection == null) 
+		{
+			return;
+		}
+
+		Navigation.PushAsync(new ProductsListPage(currentSelection.Id, currentSelection.Name!,
+													_apiService, _validator));
+
+		((CollectionView)sender).SelectedItem = null;
+    }
+
+    private void cvBestSellers_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+		if (sender is CollectionView collectionView) 
+		{ 
+			NavigateToProductDetailsPage(collectionView, e);
+		}
+    }
+
+    private void cvMostPopular_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+		if (sender is CollectionView collectionView) 
+		{
+			NavigateToProductDetailsPage(collectionView, e);
+		}
+    }
+
+    private void NavigateToProductDetailsPage(CollectionView collectionView, SelectionChangedEventArgs e)
+    {
+		var currentSelection = e.CurrentSelection.FirstOrDefault() as Product;
+
+		if (currentSelection == null) 
+		{
+			return;
+		}
+
+		Navigation.PushAsync(new ProductDetailsPage(currentSelection.Id, currentSelection.Name!,
+													_apiService, _validator));
+
+		collectionView.SelectedItem = null;
+    }
 }
