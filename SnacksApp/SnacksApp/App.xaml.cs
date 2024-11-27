@@ -7,12 +7,15 @@
     public partial class App : Application
     {
         private readonly ApiService _apiService;
+        private readonly FavoritesService _favoritesService;
         private readonly IValidator _validator;
 
-        public App(ApiService apiService, IValidator validator)
+        public App(ApiService apiService, FavoritesService favoritesService,
+                    IValidator validator)
         {
             InitializeComponent();
             _apiService = apiService;
+            _favoritesService = favoritesService;
             _validator = validator;
 
             SetMainPage();
@@ -24,11 +27,11 @@
 
             if (string.IsNullOrEmpty(accessToken)) 
             {
-                MainPage = new NavigationPage(new LoginPage(_apiService, _validator));
+                MainPage = new NavigationPage(new LoginPage(_apiService, _favoritesService, _validator));
                 return;
             }
 
-            MainPage = new AppShell(_apiService, _validator);
+            MainPage = new AppShell(_apiService, _favoritesService, _validator);
         }
     }
 }

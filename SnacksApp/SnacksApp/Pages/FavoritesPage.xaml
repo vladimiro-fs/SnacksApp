@@ -3,10 +3,54 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SnacksApp.Pages.FavoritesPage"
              Title="FavoritesPage">
+    
     <VerticalStackLayout>
-        <Label 
-            Text="Favorites Page"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+
+        <Label x:Name="lblWarning"
+               Text="No item selected"
+               FontSize="Large"
+               FontAttributes="Bold"
+               TextColor="Red"
+               HorizontalOptions="Center"
+               VerticalOptions="Center"
+               IsVisible="False" />
+
+        <CollectionView x:Name="cvProducts"
+                        Margin="10"
+                        SelectionMode="Single"
+                        SelectionChanged="cvProducts_SelectionChanged">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="2"
+                                 HorizontalItemSpacing="15"
+                                 VerticalItemSpacing="15"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border VerticalOptions="Start"
+                            StrokeShape="RoundRectangle 10, 10, 10, 10"
+                            Padding="10">
+                        <Grid RowSpacing="5"
+                              RowDefinitions="Auto, Auto, Auto, Auto"
+                              Padding="10">
+
+                            <Image Aspect="AspectFill"
+                                   HeightRequest="150"
+                                   Source="{Binding ImageUrl}" />
+                            <Label Grid.Row="1"
+                                   FontAttributes="Bold"
+                                   LineBreakMode="WordWrap"
+                                   MaxLines="2"
+                                   Text="{Binding Name}" />
+                            <Label Grid.Row="2"
+                                   FontAttributes="Bold"
+                                   Text="{Binding Price, StringFormat='{0:F2} €'}" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
     </VerticalStackLayout>
+    
 </ContentPage>

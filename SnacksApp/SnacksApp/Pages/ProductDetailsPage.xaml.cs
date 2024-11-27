@@ -8,16 +8,20 @@ using SnacksApp.Validations;
 public partial class ProductDetailsPage : ContentPage
 {
 	private readonly ApiService _apiService;
+    private readonly FavoritesService _favoritesService;
 	private readonly IValidator _validator;
 	private int _productId;
+    private string? _imageUrl;
 	private bool _loginPageDisplayed = false;
 
 	public ProductDetailsPage(int productId, string productName, 
-							ApiService apiService, IValidator validator)
+							ApiService apiService, FavoritesService favoritesService,
+                            IValidator validator)
 	{
 		InitializeComponent();
 		_productId = productId;
 		_apiService = apiService;
+        _favoritesService = favoritesService;
 		_validator = validator;
         Title = productName ?? "Product Details";
 	}
@@ -25,8 +29,8 @@ public partial class ProductDetailsPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
         await GetProductDetails(_productId);
+        UpdateFavoriteButton();
     }
 
     private async Task<Product?> GetProductDetails(int productId)
@@ -52,6 +56,7 @@ public partial class ProductDetailsPage : ContentPage
             lblProductPrice.Text = productDetails.Price.ToString();
             lblProductDescription.Text = productDetails.Description;
             lblTotalPrice.Text = productDetails.Price.ToString();
+            _imageUrl = productDetails.ImagePath;
         }
         else 
         {
@@ -62,10 +67,52 @@ public partial class ProductDetailsPage : ContentPage
         return productDetails;
     }
 
-    private void BtnFavoritesImage_Clicked(object sender, EventArgs e)
+    private async void BtnFavoritesImage_Clicked(object sender, EventArgs e)
     {
+        try
+        {
+            var favoriteExists = await _favoritesService.ReadAsync(_productId);
 
+            if (favoriteExists != null)
+            {
+                await _favoritesService.DeleteAsync(favoriteExists);
+            }
+            else 
+            {
+                var favoriteProduct = new FavoriteProduct
+                {
+                    ProductId = _productId,
+                    IsFavorite = true,
+                    Description = lblProductDescription.Text,
+                    Name = lblProductName.Text,
+                    Price = Convert.ToDecimal(lblProductPrice.Text),
+                    ImageUrl = _imageUrl,
+                };
+
+                await _favoritesService.CreateAsync(favoriteProduct);
+            }
+
+            UpdateFavoriteButton();
+        }
+        catch (Exception ex) 
+        { 
+            await DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+        }
     }
+
+    private async void UpdateFavoriteButton() 
+    {
+        var favoriteExists = await _favoritesService.ReadAsync(_productId);
+
+        if (favoriteExists != null) 
+        {
+            BtnFavoritesImage.Source = "heartfill";
+        }
+        else 
+        {
+            BtnFavoritesImage.Source = "heart";
+        }
+    }  
 
     private void BtnRemove_Clicked(object sender, EventArgs e)
     {
@@ -109,7 +156,7 @@ public partial class ProductDetailsPage : ContentPage
             var cart = new Cart
             {
                 Quantity = Convert.ToInt32(lblQuantity.Text),
-                Price = Convert.ToDecimal(lblProductPrice.Text),
+                UnitPrice = Convert.ToDecimal(lblProductPrice.Text),
                 TotalValue = Convert.ToDecimal(lblTotalPrice.Text),
                 ProductId = _productId,
                 ClientId = Preferences.Get("userId", 0),
@@ -136,7 +183,6 @@ public partial class ProductDetailsPage : ContentPage
     private async Task DisplayLoginPage() 
     { 
         _loginPageDisplayed = true;
-
-        await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+        await Navigation.PushAsync(new LoginPage(_apiService, _favoritesService, _validator));
     }
 }

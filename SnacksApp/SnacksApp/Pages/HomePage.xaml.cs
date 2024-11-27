@@ -7,14 +7,18 @@ using SnacksApp.Validations;
 public partial class HomePage : ContentPage
 {
 	private readonly ApiService _apiService;
+	private readonly FavoritesService _favoritesService;
 	private readonly IValidator _validator;
 	private bool _loginPageDisplayed = false;
+	private bool _isDataLoaded = false;
 
-	public HomePage(ApiService apiService, IValidator validator)
+	public HomePage(ApiService apiService, FavoritesService favoritesService,
+					IValidator validator)
 	{
 		InitializeComponent();
-		lblUserName.Text = "Hello, " + Preferences.Get("username", string.Empty);
+		lblUserName.Text = "Hello, " + Preferences.Get("userName", string.Empty);
 		_apiService = apiService;
+		_favoritesService = favoritesService;
 		_validator = validator;
 		Title = AppConfig.HomePageTitle;
 	}
@@ -23,9 +27,20 @@ public partial class HomePage : ContentPage
 	{ 
 		base.OnAppearing();
 
-		await GetCategoriesList();
-		await GetBestSellers();
-		await GetMostPopular();
+		if (!_isDataLoaded) 
+		{
+			await LoadDataAsync();
+			_isDataLoaded = true;
+		}
+	}
+
+	private async Task LoadDataAsync() 
+	{
+		var categoriesTask = GetCategoriesList();
+		var bestSellersTask = GetBestSellers();
+		var popularTask = GetPopular();
+
+		await Task.WhenAll(categoriesTask, bestSellersTask, popularTask);	
 	}
 
 	private async Task<IEnumerable<Category>> GetCategoriesList() 
@@ -86,7 +101,7 @@ public partial class HomePage : ContentPage
 		}
 	}
 
-	private async Task<IEnumerable<Product>> GetMostPopular() 
+	private async Task<IEnumerable<Product>> GetPopular() 
 	{
 		try
 		{
@@ -118,8 +133,7 @@ public partial class HomePage : ContentPage
 	private async Task DisplayLoginPage() 
 	{ 
 		_loginPageDisplayed = true;
-
-		await Navigation.PushAsync(new LoginPage(_apiService, _validator));	
+		await Navigation.PushAsync(new LoginPage(_apiService, _favoritesService, _validator));	
 	}
 
     private void cvCategorias_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -132,7 +146,7 @@ public partial class HomePage : ContentPage
 		}
 
 		Navigation.PushAsync(new ProductsListPage(currentSelection.Id, currentSelection.Name!,
-													_apiService, _validator));
+													_apiService, _favoritesService, _validator));
 
 		((CollectionView)sender).SelectedItem = null;
     }
@@ -163,7 +177,7 @@ public partial class HomePage : ContentPage
 		}
 
 		Navigation.PushAsync(new ProductDetailsPage(currentSelection.Id, currentSelection.Name!,
-													_apiService, _validator));
+													_apiService, _favoritesService, _validator));
 
 		collectionView.SelectedItem = null;
     }

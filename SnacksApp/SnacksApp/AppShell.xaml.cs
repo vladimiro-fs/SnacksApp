@@ -7,12 +7,15 @@
     public partial class AppShell : Shell
     {
         private readonly ApiService _apiService;
+        private readonly FavoritesService _favoritesService;
         private readonly IValidator _validator;
 
-        public AppShell(ApiService apiService, IValidator validator)
+        public AppShell(ApiService apiService, FavoritesService favoritesService, 
+                        IValidator validator)
         {
             InitializeComponent();
             _apiService = apiService;
+            _favoritesService = favoritesService;
             _validator = validator;
 
             ConfigureShell();
@@ -20,9 +23,9 @@
 
         private void ConfigureShell()
         {
-            var homePage = new HomePage(_apiService, _validator);
-            var cartPage = new CartPage();
-            var favoritesPage = new FavoritesPage();
+            var homePage = new HomePage(_apiService, _favoritesService, _validator);
+            var cartPage = new CartPage(_apiService, _favoritesService, _validator);
+            var favoritesPage = new FavoritesPage(_apiService, _favoritesService, _validator);
             var profilePage = new ProfilePage();
 
             Items.Add(new TabBar

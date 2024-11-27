@@ -6,12 +6,15 @@ using SnacksApp.Validations;
 public partial class LoginPage : ContentPage
 {
 	private readonly ApiService _apiService;
+    private readonly FavoritesService _favoritesService;
     private readonly IValidator _validator;
 
-	public LoginPage(ApiService apiService, IValidator validator)
+	public LoginPage(ApiService apiService, FavoritesService favoritesService, 
+                     IValidator validator)
 	{
 		InitializeComponent();
 		_apiService = apiService;
+        _favoritesService = favoritesService;
         _validator = validator;
 	}
 
@@ -32,7 +35,7 @@ public partial class LoginPage : ContentPage
 
         if (!response.HasError) 
         {
-            Application.Current!.MainPage = new AppShell(_apiService, _validator);
+            Application.Current!.MainPage = new AppShell(_apiService, _favoritesService, _validator);
         }
         else
         {
@@ -42,6 +45,6 @@ public partial class LoginPage : ContentPage
 
     private async void TapRegister_Tapped(object sender, TappedEventArgs e)
     {
-        await Navigation.PushAsync(new RegisterPage(_apiService, _validator));
+        await Navigation.PushAsync(new RegisterPage(_apiService, _favoritesService, _validator));
     }
 }

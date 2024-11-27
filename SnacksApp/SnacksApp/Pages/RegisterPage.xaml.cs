@@ -6,12 +6,15 @@ using SnacksApp.Validations;
 public partial class RegisterPage : ContentPage
 {
     private readonly ApiService _apiService;
+    private readonly FavoritesService _favoritesService;
     private readonly IValidator _validator;
 
-	public RegisterPage(ApiService apiService, IValidator validator)
+	public RegisterPage(ApiService apiService, FavoritesService favoritesService,
+                        IValidator validator)
 	{
 		InitializeComponent();
         _apiService = apiService;
+        _favoritesService = favoritesService;
         _validator = validator;
 	}
 
@@ -24,7 +27,7 @@ public partial class RegisterPage : ContentPage
             if (!response.HasError)
             {
                 await DisplayAlert("Warning", "Your account was successfully created!", "OK");
-                await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+                await Navigation.PushAsync(new LoginPage(_apiService, _favoritesService, _validator));
             }
             else
             {
@@ -46,6 +49,6 @@ public partial class RegisterPage : ContentPage
 
     private async void TapLogin_Tapped(object sender, TappedEventArgs e)
     {
-        await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+        await Navigation.PushAsync(new LoginPage(_apiService, _favoritesService, _validator));
     }
 }

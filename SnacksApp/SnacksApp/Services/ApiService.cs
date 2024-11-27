@@ -1,5 +1,6 @@
 ﻿namespace SnacksApp.Services
 {
+    using System.Net;
     using System.Net.Http.Headers;
     using System.Text;
     using System.Text.Json;
@@ -157,14 +158,30 @@
             try 
             {
                 var result = await _httpClient.PostAsync(urlAddress, content);
-
                 return result;
             }
             catch (Exception ex) 
             {
                 _logger.LogError($"Error sending POST request to {uri}: {ex.Message}");
-
                 return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);          
+            }
+        }
+
+        private async Task<HttpResponseMessage> PutRequest(string uri, HttpContent content)
+        {
+            var urlAddress = AppConfig.BaseUrl + uri;
+
+            try
+            {
+                AddAuthorizationHeader();
+
+                var result = await _httpClient.PutAsync(urlAddress, content);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error sending PUT request to {uri}: {ex.Message}");
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
             }
         }
 
@@ -176,15 +193,19 @@
         public async Task<(List<Product>? Products, string? ErrorMessage)> GetProducts(string productType, string categoryId) 
         { 
             string endpoint = $"api/Products?productType={productType}&categoryId={categoryId}";
-
             return await GetAsync<List<Product>>(endpoint);
         }
 
         public async Task<(Product? ProductDetail, string? ErrorMessage)> GetProductDetails(int productId)
         {
             string endpoint = $"api/products/{productId}";
-
             return await GetAsync<Product>(endpoint);
+        }
+
+        public async Task<(List<CartItem>? CartItems, string? ErrorMessage)> GetCartItems(int userId)
+        {
+            var endpoint = $"api/CartItems/{userId}";
+            return await GetAsync<List<CartItem>>(endpoint);
         }
 
         private async Task<(T? Data, string? ErrorMessage)> GetAsync<T>(string endpoint) 
@@ -208,13 +229,11 @@
                     {
                         string errorMessage = "Unauthorized";
                         _logger.LogWarning(errorMessage);
-
                         return (default, errorMessage);
                     }
 
                     string generalErrorMessage = $"Request error: {response.ReasonPhrase}";
                     _logger.LogError(generalErrorMessage);
-
                     return (default, generalErrorMessage);
                 }
             }
@@ -222,21 +241,18 @@
             {
                 string errorMessage = $"HTTP request error: {ex.Message}";
                 _logger.LogError(errorMessage);
-
                 return (default, errorMessage);
             }
             catch (JsonException ex) 
             {
                 string errorMessage = $"JSON deserialization error: {ex.Message}";
                 _logger.LogError(errorMessage);
-
                 return (default, errorMessage);
             }
             catch (Exception ex)
             {
                 string errorMessage = $"Unexpected error: {ex.Message}";
                 _logger.LogError(errorMessage);
-
                 return (default, errorMessage);
             }
         }
@@ -249,6 +265,80 @@
             {
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
             }
-        }      
+        }
+
+        public async Task<(bool Data, string? ErrorMessage)> UpdateCartItemQuantity(int productId, string action)
+        {
+            try
+            {
+                var content = new StringContent(string.Empty, Encoding.UTF8, "application/json");
+                var response = await PutRequest($"api/CartItems?productId={productId}&action={action}", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return (true, null);
+                }
+                else
+                {
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        string errorMessage = "Unauthorized";
+                        _logger.LogWarning(errorMessage);
+
+                        return (false, errorMessage);
+                    }
+
+                    string generalErrorMessage = $"Request error: {response.ReasonPhrase}";
+                    _logger.LogError(generalErrorMessage);
+                    return (false, generalErrorMessage);
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                string errorMessage = $"HTTP request error: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (false, errorMessage);
+            }
+            catch (Exception ex)  
+            { 
+                string errorMessage = $"Unexpected error: {ex.Message}";
+                _logger.LogError(ex, errorMessage);
+                return (false, errorMessage);
+            }
+        }
+
+        public async Task<ApiResponse<bool>> ConfirmOrder(Order order) 
+        { 
+            try 
+            {
+                var json = JsonSerializer.Serialize(order, _serializerOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await PostRequest("api/Orders", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMessage = response.StatusCode == HttpStatusCode.Unauthorized
+                        ? "Unauthorized"
+                        : $"Error sending HTTP request: {response.StatusCode}";
+                }
+
+                _logger.LogError($"Error sending HTTP request: {response.StatusCode}");
+                
+                return new ApiResponse<bool>
+                {
+                    Data = true,
+                };
+            }
+            catch (Exception ex)  
+            {
+                _logger.LogError($"Error confirming request: {ex.Message}");
+
+                return new ApiResponse<bool>
+                {
+                    ErrorMessage = ex.Message,
+                };
+            }
+        }
     }
 }

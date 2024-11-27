@@ -9,16 +9,19 @@ using SnacksApp.Validations;
 public partial class ProductsListPage : ContentPage
 {
 	private readonly ApiService _apiService;
+	private readonly FavoritesService _favoritesService;
 	private readonly IValidator _validator;
 	private int _categoryId;
 	private bool _loginPageDisplayed = false;
 
 	public ProductsListPage(int categoryId, string categoryName,
-							ApiService apiService, IValidator validator)
+							ApiService apiService, FavoritesService favoritesService, 
+							IValidator validator)
 	{
 		InitializeComponent();
 		_categoryId = categoryId;
 		_apiService = apiService;
+		_favoritesService = favoritesService;
 		_validator = validator;
 		Title = categoryName ?? "Products";
 	}
@@ -26,7 +29,6 @@ public partial class ProductsListPage : ContentPage
 	protected override async void OnAppearing() 
 	{ 
 		base.OnAppearing();
-
         await GetProductsList(_categoryId);
 	}
 
@@ -49,7 +51,6 @@ public partial class ProductsListPage : ContentPage
 			}
 
 			cvProducts.ItemsSource = products;
-
 			return products;
 		}
 		catch (Exception ex) 
@@ -62,8 +63,7 @@ public partial class ProductsListPage : ContentPage
 	private async Task DisplayLoginPage() 
 	{ 
 		_loginPageDisplayed = true;
-
-		await Navigation.PushAsync(new LoginPage(_apiService, _validator));
+		await Navigation.PushAsync(new LoginPage(_apiService, _favoritesService, _validator));
 	}
 
     private void cvProducts_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -76,7 +76,7 @@ public partial class ProductsListPage : ContentPage
 		}
 
 		Navigation.PushAsync(new ProductDetailsPage(currentSelection.Id, currentSelection.Name!,
-													_apiService, _validator));
+													_apiService, _favoritesService, _validator));
 
 		((CollectionView)sender).SelectedItem = null;
     }

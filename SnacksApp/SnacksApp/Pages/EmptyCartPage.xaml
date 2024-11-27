@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SnacksApp.Pages.EmptyCartPage"
+             Title="EmptyCartPage">
+
+    <VerticalStackLayout VerticalOptions="CenterAndExpand"
+                         HorizontalOptions="CenterAndExpand"
+                         Padding="20"
+                         Spacing="20">
+
+        <Image Source="emptycart.jpg"
+               HeightRequest="300"
+               WidthRequest="300"
+               Aspect="AspectFit" />
+
+        <Label Text="Your cart is empty"
+               FontSize="24"
+               VerticalOptions="CenterAndExpand"
+               HorizontalOptions="Center"
+               TextColor="DarkBlue"
+               Margin="0, 20, 0, 0" />
+
+        <Button Text="Back"
+                BackgroundColor="DarkBlue"
+                VerticalOptions="CenterAndExpand"
+                HorizontalOptions="Center"
+                x:Name="BtnBack"
+                Clicked="BtnBack_Clicked" />
+
+    </VerticalStackLayout>
+    
+</ContentPage>
