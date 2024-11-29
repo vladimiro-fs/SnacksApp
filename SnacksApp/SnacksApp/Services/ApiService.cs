@@ -151,6 +151,45 @@
             }
         }
 
+        public async Task<ApiResponse<bool>> UploadUserImage(byte[] imageArray)
+        {
+            try
+            {
+                var content = new MultipartFormDataContent();
+                content.Add(new ByteArrayContent(imageArray), "image", "image.jpg");
+
+                var response = await PostRequest("api/Users/uploaduserphoto", content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    string errorMessage = response.StatusCode == HttpStatusCode.Unauthorized
+                        ? "Unauthorized"
+                        : $"Error sending HTTP request: {response.StatusCode}";
+
+                    _logger.LogError($"Error sending HTTP request: {response.StatusCode}");
+
+                    return new ApiResponse<bool>
+                    {
+                        ErrorMessage = errorMessage,
+                    };
+                }
+
+                return new ApiResponse<bool>
+                {
+                    Data = true,
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error uploading user's image: {ex.Message}");
+
+                return new ApiResponse<bool>
+                {
+                    ErrorMessage = ex.Message,
+                };
+            }
+        }
+
         private async Task<HttpResponseMessage> PostRequest(string uri, HttpContent content) 
         { 
             var urlAddress = _baseUrl + uri;
@@ -163,7 +202,7 @@
             catch (Exception ex) 
             {
                 _logger.LogError($"Error sending POST request to {uri}: {ex.Message}");
-                return new HttpResponseMessage(System.Net.HttpStatusCode.BadRequest);          
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);          
             }
         }
 
@@ -196,7 +235,7 @@
             return await GetAsync<List<Product>>(endpoint);
         }
 
-        public async Task<(Product? ProductDetail, string? ErrorMessage)> GetProductDetails(int productId)
+        public async Task<(Product? ProductDetails, string? ErrorMessage)> GetProductDetails(int productId)
         {
             string endpoint = $"api/products/{productId}";
             return await GetAsync<Product>(endpoint);
@@ -206,6 +245,24 @@
         {
             var endpoint = $"api/CartItems/{userId}";
             return await GetAsync<List<CartItem>>(endpoint);
+        }
+
+        public async Task<(ProfileImage? ProfileImage, string? ErrorMessage)> GetUserProfileImage()
+        {
+            string endpoint = "api/users/UserProfileImage";
+            return await GetAsync<ProfileImage>(endpoint);
+        }
+
+        public async Task<(List<OrderByUser>? Orders, string? ErrorMessage)> GetOrdersByUser(int userId)
+        {
+            string endpoint = $"api/orders/OrdersByUser/{userId}";
+            return await GetAsync<List<OrderByUser>>(endpoint);
+        }
+
+        public async Task<(List<OrderDetail>? OrderDetails, string? ErrorMessage)> GetOrderDetails(int orderId) 
+        { 
+            string endpoint = $"api/orders/OrderDetails/{orderId}";
+            return await GetAsync<List<OrderDetail>>(endpoint);
         }
 
         private async Task<(T? Data, string? ErrorMessage)> GetAsync<T>(string endpoint) 
@@ -225,7 +282,7 @@
                 }
                 else 
                 {
-                    if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized) 
+                    if (response.StatusCode == HttpStatusCode.Unauthorized) 
                     {
                         string errorMessage = "Unauthorized";
                         _logger.LogWarning(errorMessage);
@@ -339,6 +396,6 @@
                     ErrorMessage = ex.Message,
                 };
             }
-        }
+        }    
     }
 }

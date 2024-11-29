@@ -26,7 +26,7 @@
             var homePage = new HomePage(_apiService, _favoritesService, _validator);
             var cartPage = new CartPage(_apiService, _favoritesService, _validator);
             var favoritesPage = new FavoritesPage(_apiService, _favoritesService, _validator);
-            var profilePage = new ProfilePage();
+            var profilePage = new ProfilePage(_apiService, _favoritesService, _validator);
 
             Items.Add(new TabBar
             {

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SnacksApp.Pages.MyAccountPage"
+             Title="MyAccountPage">
+
+    <Grid RowDefinitions="Auto, *"
+          RowSpacing="0">
+
+        <VerticalStackLayout Grid.Row="0"
+                             Spacing="1"
+                             Padding="20"
+                             VerticalOptions="Start"
+                             BackgroundColor="Cyan">
+
+            <ImageButton Source="user1.png"
+                         HeightRequest="250"
+                         WidthRequest="250"
+                         Padding="1"
+                         Aspect="AspectFill"
+                         x:Name="BtnProfileImage" />
+
+            <Label x:Name="lblUserName"
+                   HorizontalOptions="Center"
+                   TextColor="Black" />
+
+        </VerticalStackLayout>
+
+        <VerticalStackLayout Grid.Row="1"
+                             Margin="20"
+                             Spacing="20">
+
+            <Entry Placeholder="Name"
+                   x:Name="EntName" />
+
+            <Entry Placeholder="Email"
+                   Keyboard="Email"
+                   x:Name="EntEmail" />
+
+            <Entry Placeholder="PhoneNumber"
+                   Keyboard="Telephone"
+                   x:Name="EntPhoneNumber" />
+
+            <Button Text="Save"
+                    FontSize="Large"
+                    FontAttributes="Bold"
+                    BackgroundColor="Cyan"
+                    TextColor="Maroon"
+                    x:Name="BtnSave"
+                    Clicked="BtnSave_Clicked" />
+            
+        </VerticalStackLayout>
+        
+    </Grid>
+    
+</ContentPage>
