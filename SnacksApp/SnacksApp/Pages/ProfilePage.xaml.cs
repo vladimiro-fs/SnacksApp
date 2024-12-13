@@ -152,5 +152,4 @@ public partial class ProfilePage : ContentPage
         _loginPageDisplayed = true;
         await Navigation.PushAsync(new LoginPage(_apiService, _favoritesService, _validator));
     }
-
 }

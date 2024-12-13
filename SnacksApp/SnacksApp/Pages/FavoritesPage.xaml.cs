@@ -1,8 +1,8 @@
+namespace SnacksApp.Pages;
+
 using SnacksApp.Models;
 using SnacksApp.Services;
 using SnacksApp.Validations;
-
-namespace SnacksApp.Pages;
 
 public partial class FavoritesPage : ContentPage
 {

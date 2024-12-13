@@ -84,9 +84,6 @@
                          BackgroundColor="Transparent"
                          x:Name="BtnLogout" 
                          Clicked="BtnLogout_Clicked"/>
-
-
-
         </VerticalStackLayout>
     </Grid>
     

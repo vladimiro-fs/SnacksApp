@@ -4,57 +4,72 @@
              x:Class="SnacksApp.Pages.OrderDetailsPage"
              Title="OrderDetailsPage">
 
-    <CollectionView x:Name="cvOrderDetails"
-                    Margin="20">
+    <VerticalStackLayout>
 
-        <CollectionView.ItemTemplate>
-            <DataTemplate>
+        <ActivityIndicator x:Name="loadIndicator"
+                           IsRunning="False"
+                           IsVisible="False"
+                           Color="Blue"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
 
-                <Border Padding="10"
-                        Stroke="#87A7AC"
-                        StrokeShape="RoundRectangle 10">
+        <CollectionView x:Name="cvOrderDetails"
+                        Margin="20">
 
-                    <Grid RowDefinitions="Auto, Auto, Auto"
-                          ColumnDefinitions="2*, 8*"
-                          ColumnSpacing="10">
+            <CollectionView.ItemsLayout>
+                <LinearItemsLayout Orientation="Vertical"
+                                   ItemSpacing="5" />
+            </CollectionView.ItemsLayout>
 
-                        <Image Grid.Row="0"
-                               VerticalOptions="Start"
-                               Aspect="Fill"
-                               HeightRequest="60"
-                               WidthRequest="60"
-                               Grid.RowSpan="3"
-                               Grid.Column="0"
-                               Source="{Binding ImagePath}" />
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
 
-                        <Label Grid.Row="2"
-                               Grid.Column="1"
-                               Text="{Binding ProductName}" />
-                        <Label Grid.Row="1" 
-                               Grid.Column="1"
-                               Text="{Binding ProductPrice, StringFormat='€'}" />
+                    <Border Padding="10"
+                                Stroke="#87A7AC"
+                                StrokeShape="RoundRectangle 10">
 
-                        <Label Grid.Row="2"
-                               Grid.Column="1">
-                            <Label.FormattedText>
-                                <FormattedString>
-                                    <Span Text="x" />
-                                    <Span Text="{Binding Quantity}" />
-                                </FormattedString>
-                            </Label.FormattedText>
-                        </Label>
-                    </Grid>
-                </Border>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
+                        <Grid RowDefinitions="Auto, Auto, Auto"
+                                  ColumnDefinitions="2*, 8*"
+                                  ColumnSpacing="10">
 
-        <CollectionView.Footer>
-            <HorizontalStackLayout HorizontalOptions="End"
-                                   Spacing="10">
-                <Label Text="Total Price: " />
-                <Label x:Name="lblTotalPrice" />
-            </HorizontalStackLayout>
-        </CollectionView.Footer>
-    </CollectionView>
-        
+                            <Image Grid.Row="0"
+                                       VerticalOptions="Start"
+                                       Aspect="Fill"
+                                       HeightRequest="60"
+                                       WidthRequest="60"
+                                       Grid.RowSpan="3"
+                                       Grid.Column="0"
+                                       Source="{Binding ImagePath}" />
+
+                            <Label Grid.Row="2"
+                                       Grid.Column="1"
+                                       Text="{Binding ProductName}" />
+                            <Label Grid.Row="1" 
+                                       Grid.Column="1"
+                                       Text="{Binding ProductPrice, StringFormat='€'}" />
+
+                            <Label Grid.Row="2"
+                                       Grid.Column="1">
+                                <Label.FormattedText>
+                                    <FormattedString>
+                                        <Span Text="x" />
+                                        <Span Text="{Binding Quantity}" />
+                                    </FormattedString>
+                                </Label.FormattedText>
+                            </Label>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.Footer>
+                <HorizontalStackLayout HorizontalOptions="End"
+                                           Spacing="10">
+                    <Label Text="Total Price: " />
+                    <Label x:Name="lblTotalPrice" />
+                </HorizontalStackLayout>
+            </CollectionView.Footer>
+        </CollectionView>
+    </VerticalStackLayout>
+
 </ContentPage>

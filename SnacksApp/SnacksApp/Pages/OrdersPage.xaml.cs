@@ -28,16 +28,20 @@ public partial class OrdersPage : ContentPage
 
     private async Task GetOrdersList()
     {
-		try 
+		try
 		{
+			// Displaying the activity indicator
+			loadOrdersIndicator.IsRunning = true;
+			loadOrdersIndicator.IsVisible = true;
+
 			var (orders, errorMessage) = await _apiService.GetOrdersByUser(Preferences.Get("userId", 0));
 
-			if (errorMessage == "Unauthorized" && !_loginPageDisplayed) 
+			if (errorMessage == "Unauthorized" && !_loginPageDisplayed)
 			{
 				await DisplayLoginPage();
 				return;
 			}
-			if (errorMessage == "Not Found") 
+			if (errorMessage == "Not Found")
 			{
 				await DisplayAlert("Warning", "The user has no orders", "OK");
 				return;
@@ -47,14 +51,20 @@ public partial class OrdersPage : ContentPage
 				await DisplayAlert("Error", errorMessage ?? "Unable to get orders", "OK");
 				return;
 			}
-			else 
-			{ 
+			else
+			{
 				cvOrders.ItemsSource = orders;
 			}
 		}
 		catch (Exception)
 		{
 			await DisplayAlert("Error", "An error occurred while trying to get the orders. Try again later.", "OK");
+		}
+		finally 
+		{
+			// Hiding the activity indicator
+			loadOrdersIndicator.IsRunning = false;
+			loadOrdersIndicator.IsVisible = false;
 		}
     }
 
